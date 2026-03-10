@@ -4,13 +4,19 @@ import type { PaginatedResponse } from '@store/interfaces/pagination';
 
 /**
  * Hook générique pour un Autocomplete async avec debounce.
- * Query l'API à chaque frappe et renvoie les résultats paginés.
+ * Query l'API à chaque frappe, renvoie les résultats et les pousse dans le store via onResults.
  */
-export const useAsyncSearch = <T>(resource: string, debounceMs = 300) => {
+export const useAsyncSearch = <T>(
+  resource: string,
+  onResults?: (results: T[]) => void,
+  debounceMs = 300
+) => {
   const [options, setOptions] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const abortRef = useRef<AbortController | null>(null);
+  const onResultsRef = useRef(onResults);
+  onResultsRef.current = onResults;
 
   const fetchOptions = useCallback(
     async (search: string) => {
@@ -27,6 +33,7 @@ export const useAsyncSearch = <T>(resource: string, debounceMs = 300) => {
         if (res.ok) {
           const data: PaginatedResponse<T> = await res.json();
           setOptions(data.results);
+          onResultsRef.current?.(data.results);
         }
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;

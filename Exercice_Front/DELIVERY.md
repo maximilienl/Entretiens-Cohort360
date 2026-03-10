@@ -74,11 +74,15 @@ Les prescriptions sont paginées côté API (`?offset=X&elements=Y`). Seule la p
 
 ### Recherche asynchrone via `useAsyncSearch`
 
-Les sélecteurs patient et médicament (filtres et formulaire) utilisent un hook générique `useAsyncSearch<T>` qui requête l'API à chaque frappe avec un debounce de 300 ms. Chaque nouvelle frappe annule la requête précédente via `AbortController`, évitant les race conditions. Cette approche remplace le preload complet des référentiels et supporte des volumes importants (milliers de patients) sans charger l'intégralité en mémoire.
+Les sélecteurs patient et médicament (filtres et formulaire) utilisent un hook générique `useAsyncSearch<T>` qui requête l'API à chaque frappe avec un debounce de 300 ms. Chaque nouvelle frappe annule la requête précédente via `AbortController`, évitant les race conditions. Les résultats sont à la fois affichés dans le dropdown et injectés dans le store Redux via un callback `onResults` qui dispatch une action `upsertPatients` / `upsertMedications`.
 
-### Stores patients/médicaments conservés
+### Double alimentation du store
 
-Bien que la sélection passe désormais par l'API, les slices Redux pour patients et médicaments sont maintenus. Ils servent de cache (via Redux Persist / IndexedDB) et restent disponibles pour de futurs besoins (dashboard, statistiques, affichage hors-ligne). L'utilitaire `fetchAllPages` est conservé pour les cas nécessitant une liste exhaustive.
+Le store patients/médicaments est alimenté par deux canaux complémentaires : le preload au montage du `Wrapper` (via `fetchAllPages`, charge l'intégralité du référentiel) et l'upsert incrémental à chaque recherche Autocomplete. Le preload garantit un cache complet dès le démarrage ; l'upsert enrichit le store avec d'éventuelles données créées après le preload initial. Le store normalisé (`Record<number, T>`) assure la déduplication naturelle des deux flux.
+
+### Preload au niveau du Wrapper
+
+Le chargement complet de patients et médicaments est déclenché dans le `Wrapper` (layout racine avec `<Outlet />`). Les données sont ainsi disponibles dès le montage de n'importe quelle route enfant. Combiné au cache Redux Persist, l'interface s'affiche instantanément avec les données en IndexedDB pendant que le preload rafraîchit en arrière-plan.
 
 ### Filtres en state local
 

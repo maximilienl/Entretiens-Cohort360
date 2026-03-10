@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -8,7 +8,10 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import type { SelectChangeEvent } from '@mui/material/Select';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAsyncSearch } from '@hooks/useAsyncSearch';
+import { upsertPatients } from '@store/patients/slice';
+import { upsertMedications } from '@store/medications/slice';
 import type { PatientState } from '@store/patients/interfaces/patientState';
 import type { MedicationState } from '@store/medications/interfaces/medicationState';
 import type { PrescriptionPayload } from '@store/prescriptions/interfaces/prescriptionState';
@@ -32,8 +35,17 @@ export const FormFields: React.FC<Props> = ({
   initialPatient,
   initialMedication,
 }) => {
-  const patientSearch = useAsyncSearch<PatientState>('Patient');
-  const medicationSearch = useAsyncSearch<MedicationState>('Medication');
+  const dispatch = useAppDispatch();
+  const storePatients = useCallback(
+    (results: PatientState[]) => dispatch(upsertPatients(results)),
+    [dispatch]
+  );
+  const storeMedications = useCallback(
+    (results: MedicationState[]) => dispatch(upsertMedications(results)),
+    [dispatch]
+  );
+  const patientSearch = useAsyncSearch<PatientState>('Patient', storePatients);
+  const medicationSearch = useAsyncSearch<MedicationState>('Medication', storeMedications);
 
   const [selectedPatient, setSelectedPatient] = useState<PatientState | null>(
     initialPatient ?? null

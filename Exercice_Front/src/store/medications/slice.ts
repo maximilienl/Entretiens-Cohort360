@@ -15,7 +15,13 @@ const initialState: MedicationsState = {
 const medicationsSlice = createSlice({
   name: 'medications',
   initialState,
-  reducers: {},
+  reducers: {
+    upsertMedications(state, action: PayloadAction<MedicationState[]>) {
+      for (const medication of action.payload) {
+        state.medications[medication.id] = medication;
+      }
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchMedications.pending, state => {
@@ -43,4 +49,5 @@ const medicationsSlice = createSlice({
   },
 });
 
+export const { upsertMedications } = medicationsSlice.actions;
 export default medicationsSlice.reducer;

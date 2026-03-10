@@ -12,7 +12,13 @@ const initialState: PatientsState = {
 const patientsSlice = createSlice({
   name: 'patients',
   initialState,
-  reducers: {},
+  reducers: {
+    upsertPatients(state, action: PayloadAction<PatientState[]>) {
+      for (const patient of action.payload) {
+        state.patients[patient.id] = patient;
+      }
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchPatients.pending, state => {
@@ -37,4 +43,5 @@ const patientsSlice = createSlice({
   },
 });
 
+export const { upsertPatients } = patientsSlice.actions;
 export default patientsSlice.reducer;

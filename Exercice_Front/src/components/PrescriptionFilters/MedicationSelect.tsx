@@ -1,7 +1,10 @@
+import { useCallback } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAsyncSearch } from '@hooks/useAsyncSearch';
+import { upsertMedications } from '@store/medications/slice';
 import type { MedicationState } from '@store/medications/interfaces/medicationState';
 
 interface Props {
@@ -11,8 +14,13 @@ interface Props {
 
 /** Autocomplete async de filtrage par médicament, recherche via l'API. */
 export const MedicationSelect: React.FC<Props> = ({ value, onChange }) => {
+  const dispatch = useAppDispatch();
+  const storeResults = useCallback(
+    (results: MedicationState[]) => dispatch(upsertMedications(results)),
+    [dispatch]
+  );
   const { options, loading, inputValue, setInputValue } =
-    useAsyncSearch<MedicationState>('Medication');
+    useAsyncSearch<MedicationState>('Medication', storeResults);
 
   const selected = options.find(m => m.id === value) ?? null;
 
