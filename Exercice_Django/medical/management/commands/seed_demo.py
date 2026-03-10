@@ -10,6 +10,12 @@ from medical.models import Medication, Patient, Prescription
 
 
 def random_date(start_year: int = 1940, end_year: int = 2025) -> date:
+    """Génère une date aléatoire entre deux années.
+
+    :param start_year: Année de début (incluse).
+    :param end_year: Année de fin (incluse).
+    :return: Date aléatoire dans l'intervalle.
+    """
     start_dt = date(start_year, 1, 1)
     end_dt = date(end_year, 12, 31)
     days = (end_dt - start_dt).days
@@ -17,6 +23,13 @@ def random_date(start_year: int = 1940, end_year: int = 2025) -> date:
 
 
 class Command(BaseCommand):
+    """Peuple la base avec des données de démonstration réalistes.
+
+    Usage : ``python manage.py seed_demo --patients 10 --medications 5 --prescriptions 30``
+
+    .. warning:: Supprime toutes les données existantes avant insertion.
+    """
+
     help = "Seed the database with demo Patients, Medications and Prescriptions"
 
     def add_arguments(self, parser):
@@ -42,6 +55,7 @@ class Command(BaseCommand):
         ))
 
     def _seed_patients(self, count: int) -> list[Patient]:
+        """Crée *count* patients avec des noms français aléatoires."""
         last_names = [
             "Martin", "Bernard", "Thomas", "Petit", "Robert",
             "Richard", "Durand", "Dubois", "Moreau", "Laurent",
@@ -81,6 +95,7 @@ class Command(BaseCommand):
         return Patient.objects.bulk_create(patients)
 
     def _seed_medications(self, count: int) -> list[Medication]:
+        """Crée *count* médicaments avec codes uniques et dosages aléatoires."""
         base_labels = [
             "Paracetamol", "Ibuprofen", "Amoxicillin", "Aspirin", "Omeprazole",
             "Metformin", "Loratadine", "Cetirizine", "Azithromycin", "Atorvastatin",
@@ -120,6 +135,7 @@ class Command(BaseCommand):
         patients: list[Patient],
         medications: list[Medication],
     ) -> list[Prescription]:
+        """Crée *count* prescriptions avec distribution réaliste des statuts (50/35/15)."""
         statuses = [
             Prescription.STATUS_VALIDE,
             Prescription.STATUS_EN_ATTENTE,

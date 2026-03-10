@@ -11,7 +11,13 @@ from .patient import PatientSerializer
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
-    """Serializer pour les prescriptions — lecture enrichie, écriture par ID."""
+    """Serializer hybride pour :class:`~medical.models.Prescription`.
+
+    En écriture, accepte ``patient_id`` et ``medication_id`` (clés primaires).
+    En lecture, renvoie les objets ``patient`` et ``medication`` nestés.
+
+    :raises serializers.ValidationError: Si ``end_date < start_date``.
+    """
 
     patient_id = serializers.PrimaryKeyRelatedField(
         queryset=Patient.objects.all(), source="patient", write_only=True,

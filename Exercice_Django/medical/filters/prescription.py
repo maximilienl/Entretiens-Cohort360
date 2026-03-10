@@ -6,6 +6,12 @@ from medical.models import Prescription
 
 
 class PrescriptionFilter(django_filters.FilterSet):
+    """Filtres avancés pour :class:`~medical.models.Prescription`.
+
+    Tous les filtres sont combinables. Les filtres de dates acceptent
+    les suffixes ``_gte`` et ``_lte`` pour les intervalles.
+    """
+
     patient = django_filters.NumberFilter(field_name="patient_id")
     medication = django_filters.NumberFilter(field_name="medication_id")
     status = django_filters.CharFilter(field_name="status", lookup_expr="exact")

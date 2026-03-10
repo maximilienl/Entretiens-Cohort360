@@ -6,6 +6,12 @@ from medical.models import Patient
 
 
 class PatientFilter(django_filters.FilterSet):
+    """Filtres de recherche pour :class:`~medical.models.Patient`.
+
+    Supporte les query params ``nom``, ``prenom``, ``date_naissance``
+    et ``id`` (liste d'IDs séparés par virgule ou répétés).
+    """
+
     nom = django_filters.CharFilter(field_name="last_name", lookup_expr="icontains")
     prenom = django_filters.CharFilter(field_name="first_name", lookup_expr="icontains")
     date_naissance = django_filters.DateFilter(field_name="birth_date")

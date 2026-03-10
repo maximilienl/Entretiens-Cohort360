@@ -4,7 +4,14 @@ from django.db import models
 
 
 class Medication(models.Model):
-    """Représente un médicament."""
+    """Représente un médicament référencé dans le système.
+
+    :cvar STATUS_ACTIF: Médicament actif.
+    :cvar STATUS_SUPPR: Médicament supprimé (soft-delete).
+    :ivar code: Code unique du médicament (ex. ``MED1234A``).
+    :ivar label: Libellé avec dosage (ex. ``Paracetamol 500mg``).
+    :ivar status: Statut courant parmi :attr:`STATUS_CHOICES`.
+    """
 
     STATUS_ACTIF = "actif"
     STATUS_SUPPR = "suppr"

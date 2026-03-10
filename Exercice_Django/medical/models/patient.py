@@ -4,7 +4,12 @@ from django.db import models
 
 
 class Patient(models.Model):
-    """Représente un patient."""
+    """Représente un patient dans le système médical.
+
+    :ivar last_name: Nom de famille.
+    :ivar first_name: Prénom.
+    :ivar birth_date: Date de naissance (optionnelle).
+    """
 
     last_name = models.CharField(max_length=150)
     first_name = models.CharField(max_length=150)

@@ -6,6 +6,8 @@ from medical.models import Patient
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    """Serializer lecture pour :class:`~medical.models.Patient`."""
+
     class Meta:
         model = Patient
         fields = ["id", "last_name", "first_name", "birth_date"]

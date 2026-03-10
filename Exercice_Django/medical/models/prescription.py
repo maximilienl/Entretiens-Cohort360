@@ -8,7 +8,20 @@ from .patient import Patient
 
 
 class Prescription(models.Model):
-    """Prescription d'un médicament pour un patient sur une période donnée."""
+    """Prescription d'un médicament pour un patient sur une période donnée.
+
+    :cvar STATUS_VALIDE: Prescription validée.
+    :cvar STATUS_EN_ATTENTE: Prescription en attente de validation.
+    :cvar STATUS_SUPPR: Prescription supprimée (soft-delete).
+    :ivar patient: Patient concerné (cascade on delete).
+    :ivar medication: Médicament prescrit (protégé contre la suppression).
+    :ivar start_date: Date de début de la prescription.
+    :ivar end_date: Date de fin, doit être >= ``start_date``.
+    :ivar status: Statut courant parmi :attr:`STATUS_CHOICES`.
+    :ivar comment: Commentaire libre (optionnel).
+
+    :raises ValidationError: Si ``end_date < start_date``.
+    """
 
     STATUS_VALIDE = "valide"
     STATUS_EN_ATTENTE = "en_attente"
