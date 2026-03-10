@@ -74,15 +74,11 @@ Les prescriptions sont paginées côté API (`?offset=X&elements=Y`). Seule la p
 
 ### Recherche asynchrone via `useAsyncSearch`
 
-Les sélecteurs patient et médicament (filtres et formulaire) utilisent un hook générique `useAsyncSearch<T>` qui requête l'API à chaque frappe avec un debounce de 300 ms. Chaque nouvelle frappe annule la requête précédente via `AbortController`, évitant les race conditions. Les résultats sont à la fois affichés dans le dropdown et injectés dans le store Redux via un callback `onResults` qui dispatch une action `upsertPatients` / `upsertMedications`.
+Les sélecteurs patient et médicament (filtres et formulaire) utilisent un hook générique `useAsyncSearch<T>` qui requête l'API à chaque frappe avec un debounce de 300 ms. Chaque nouvelle frappe annule la requête précédente via `AbortController`, évitant les race conditions. Les résultats sont à la fois affichés dans le dropdown et injectés dans le store Redux via un callback `onResults` qui dispatch une action `upsertPatients` / `upsertMedications`. Le store s'enrichit progressivement au fil des recherches utilisateur, sans preload massif au démarrage.
 
-### Double alimentation du store
+### Pas de preload des référentiels
 
-Le store patients/médicaments est alimenté par deux canaux complémentaires : le preload au montage du `Wrapper` (via `fetchAllPages`, charge l'intégralité du référentiel) et l'upsert incrémental à chaque recherche Autocomplete. Le preload garantit un cache complet dès le démarrage ; l'upsert enrichit le store avec d'éventuelles données créées après le preload initial. Le store normalisé (`Record<number, T>`) assure la déduplication naturelle des deux flux.
-
-### Preload au niveau du Wrapper
-
-Le chargement complet de patients et médicaments est déclenché dans le `Wrapper` (layout racine avec `<Outlet />`). Les données sont ainsi disponibles dès le montage de n'importe quelle route enfant. Combiné au cache Redux Persist, l'interface s'affiche instantanément avec les données en IndexedDB pendant que le preload rafraîchit en arrière-plan.
+Aucun chargement exhaustif de patients ou médicaments n'est effectué au montage. Avec 2 500+ patients, un `fetchAllPages` par pages de 20 génèrerait 125+ requêtes séquentielles. L'Autocomplete async ne requête que ce dont l'utilisateur a besoin, une seule page filtrée par recherche. Le store Redux accumule les entités vues via les upserts et les persiste en IndexedDB pour les sessions suivantes.
 
 ### Filtres en state local
 
